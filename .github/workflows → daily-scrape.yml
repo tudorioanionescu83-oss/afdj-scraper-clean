@@ -1,8 +1,4 @@
 name: 🐟 AFDJ Live Scraper
 on:
   schedule:
-    - cron: '30 7 * * *'
-  workflow_dispatch:
-jobs:
-  scrape:
-    runs-on
+    - cron: '30 7 *
