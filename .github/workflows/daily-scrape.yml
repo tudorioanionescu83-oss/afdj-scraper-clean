@@ -1,1 +1,5 @@
 name: 🐟
+: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      -
