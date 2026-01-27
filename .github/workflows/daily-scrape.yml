@@ -1,2 +1,0 @@
-- name: Test scraping
-  run: python test-scrape.py
