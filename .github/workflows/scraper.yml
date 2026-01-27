@@ -1,4 +1,0 @@
-- name: Install
-        run: |
-          pip cache purge || true
-          pip install --no-cache-dir requests beautifulsoup4
