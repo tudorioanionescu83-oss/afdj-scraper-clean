@@ -1,5 +1,4 @@
-name: 🐟
-: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      -
+name: 🐟 AFDJ Live Scraper
+on:
+  schedule:
+    - cron
