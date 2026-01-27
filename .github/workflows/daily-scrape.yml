@@ -1,4 +1,0 @@
-name: 🐟 AFDJ Live Scraper
-on:
-  schedule:
-    - cron
