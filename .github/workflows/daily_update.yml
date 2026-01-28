@@ -1,0 +1,34 @@
+name: Actualizare Zilnica Cote Dunare
+
+on:
+  schedule:
+    - cron: '45 7 * * *'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout cod
+        uses: actions/checkout@v4
+
+      - name: Configurare Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+
+      - name: Instalare dependente
+        run: |
+          pip install playwright pdfplumber pandas
+          playwright install chromium
+
+      - name: Rulare Scraper
+        run: python scraper.py
+
+      - name: Commit si Push
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add .
+          git commit -m "Actualizare date: $(date)" || exit 0
+          git push
