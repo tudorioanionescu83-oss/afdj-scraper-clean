@@ -1,0 +1,67 @@
+name: Scrape AFDJ On-Demand
+
+on:
+  # Rulează doar manual din GitHub UI
+  workflow_dispatch:
+    inputs:
+      export_format:
+        description: 'Export format (all, json, csv, excel)'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - json
+          - csv
+          - excel
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install requests beautifulsoup4 pandas openpyxl lxml
+    
+    - name: Run scraper with custom format
+      run: |
+        python -c "
+        from afdj_final_scraper import AFDJCoteScraper
+        scraper = AFDJCoteScraper()
+        scraper.scrape(export_format='${{ github.event.inputs.export_format }}')
+        "
+    
+    - name: Upload results
+      uses: actions/upload-artifact@v4
+      with:
+        name: cote-dunare-on-demand-${{ github.run_number }}
+        path: |
+          cote_dunare.json
+          cote_dunare.csv
+          cote_dunare.xlsx
+        retention-days: 30
+    
+    - name: Display summary
+      run: |
+        echo "## 🌊 Scraping Results" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "Export format: **${{ github.event.inputs.export_format }}**" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        if [ -f cote_dunare.json ]; then
+          PORTS=$(python -c "import json; data=json.load(open('cote_dunare.json')); print(data['count'])")
+          echo "✅ Successfully scraped **$PORTS** ports" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Files created:" >> $GITHUB_STEP_SUMMARY
+          ls -lh cote_dunare.* 2>/dev/null | awk '{print "- " $9 " (" $5 ")"}' >> $GITHUB_STEP_SUMMARY
+        fi
