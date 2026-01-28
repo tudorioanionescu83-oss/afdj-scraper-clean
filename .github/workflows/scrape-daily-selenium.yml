@@ -1,0 +1,70 @@
+name: Scrape AFDJ Daily (Selenium)
+
+on:
+  schedule:
+    # Rulează zilnic la 06:00 UTC (08:00 Romanian time)
+    - cron: '0 6 * * *'
+  
+  # Permite rulare manuală din GitHub UI
+  workflow_dispatch:
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    
+    - name: Install Chrome
+      run: |
+        wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+        sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
+        sudo apt-get update
+        sudo apt-get install -y google-chrome-stable
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install requests beautifulsoup4 pandas openpyxl lxml selenium undetected-chromedriver
+    
+    - name: Run Selenium scraper
+      run: |
+        python afdj_selenium_scraper.py
+    
+    - name: Archive results
+      uses: actions/upload-artifact@v4
+      with:
+        name: cote-dunare-selenium-${{ github.run_number }}
+        path: |
+          cote_selenium.json
+          cote_selenium.csv
+        retention-days: 90
+    
+    - name: Commit results (optional)
+      run: |
+        git config --local user.email "github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
+        
+        # Creează folder pentru istoric
+        mkdir -p data/$(date +%Y/%m)
+        
+        # Copiază rezultatele cu timestamp
+        if [ -f cote_selenium.json ]; then
+          cp cote_selenium.json data/$(date +%Y/%m)/cote_dunare_$(date +%Y%m%d).json
+        fi
+        
+        # Commit dacă există modificări
+        git add data/
+        git diff --quiet && git diff --staged --quiet || git commit -m "Auto-update: $(date +'%Y-%m-%d %H:%M:%S')"
+    
+    - name: Push changes
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        branch: ${{ github.ref }}
