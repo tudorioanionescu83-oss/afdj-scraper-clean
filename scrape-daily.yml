@@ -1,0 +1,62 @@
+name: Scrape AFDJ Daily
+
+on:
+  schedule:
+    # Rulează zilnic la 06:00 UTC (08:00 Romanian time)
+    - cron: '0 6 * * *'
+  
+  # Permite rulare manuală din GitHub UI
+  workflow_dispatch:
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install requests beautifulsoup4 pandas openpyxl lxml
+    
+    - name: Run scraper
+      run: |
+        python afdj_final_scraper.py
+    
+    - name: Archive results
+      uses: actions/upload-artifact@v4
+      with:
+        name: cote-dunare-${{ github.run_number }}
+        path: |
+          cote_dunare.json
+          cote_dunare.csv
+          cote_dunare.xlsx
+        retention-days: 90
+    
+    - name: Commit results (optional)
+      run: |
+        git config --local user.email "github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
+        
+        # Creează folder pentru istoric
+        mkdir -p data/$(date +%Y/%m)
+        
+        # Copiază rezultatele cu timestamp
+        cp cote_dunare.json data/$(date +%Y/%m)/cote_dunare_$(date +%Y%m%d).json
+        
+        # Commit dacă există modificări
+        git add data/
+        git diff --quiet && git diff --staged --quiet || git commit -m "Auto-update: $(date +'%Y-%m-%d %H:%M:%S')"
+    
+    - name: Push changes
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        branch: ${{ github.ref }}
