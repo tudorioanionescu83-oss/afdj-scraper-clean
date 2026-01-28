@@ -1,0 +1,40 @@
+name: Actualizare Zilnica Cote Dunare
+
+on:
+  schedule:
+    - cron: '30 7 * * *'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout cod
+        uses: actions/checkout@v3
+
+      - name: Descărcare forțată PDF
+        run: |
+          wget --user-agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" \
+               --header="Referer: https://www.afdj.ro/ro/cotele-dunarii" \
+               --header="Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8" \
+               -O cote_dunare.pdf \
+               https://www.afdj.ro/sites/default/files/bhcote.pdf
+
+      - name: Configurare Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Instalare dependente
+        run: pip install pdfplumber pandas
+
+      - name: Rulare Scraper (doar extracție)
+        run: python scraper.py
+
+      - name: Commit si Push
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add .
+          git commit -m "Actualizare date: $(date)" || exit 0
+          git push
