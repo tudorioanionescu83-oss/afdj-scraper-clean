@@ -1,0 +1,6 @@
+- name: Instalare dependente
+        run: |
+          pip install -r requirements.txt
+          # Aceasta comanda instaleaza browserul si rezolva automat erorile de tip "libasound2"
+          sudo npx playwright install-deps chromium
+          python -m playwright install chromium
