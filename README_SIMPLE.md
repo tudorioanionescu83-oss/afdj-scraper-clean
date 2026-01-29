@@ -1,0 +1,160 @@
+[README_SIMPLE.md](https://github.com/user-attachments/files/24938027/README_SIMPLE.md)
+# 🌊 AFDJ Dunărea - Monitor Simplu
+
+Soluție **simplă și sigură** pentru monitorizarea cotelor Dunării.
+
+---
+
+## ⚠️ IMPORTANT: De ce LOCAL?
+
+AFDJ blochează **complet** toate serverele publice:
+- ❌ GitHub Actions
+- ❌ AWS
+- ❌ Google Cloud
+- ❌ Orice server cloud
+
+**✅ SOLUȚIE:** Rulează **pe computerul TĂU** (funcționează 100%)
+
+---
+
+## 🚀 Setup Simplu (3 pași)
+
+### Pas 1: Instalează
+
+```bash
+pip install pdfplumber requests pandas matplotlib openpyxl
+```
+
+### Pas 2: Descarcă scraper-ul
+
+```bash
+# Download acest repo
+git clone https://github.com/USERNAME/afdj-scraper-clean.git
+cd afdj-scraper-clean
+```
+
+### Pas 3: Rulează
+
+```bash
+python afdj_pdf_scraper.py
+```
+
+**GATA!** Vei avea:
+- ✅ `cote_pdf.json`
+- ✅ `cote_pdf.csv`
+- ✅ Date pentru toate cele 23 porturi
+
+---
+
+## 📊 Generare Grafice
+
+După scraping, generează grafice:
+
+```bash
+python generate_charts.py
+```
+
+Output:
+- 📊 `profil_longitudinal.png`
+- 📈 `variatii.png`
+- 🌡️ `temperaturi.png`
+
+---
+
+## 🔄 Automatizare Locală
+
+### Windows (Task Scheduler):
+
+1. Deschide Task Scheduler
+2. "Create Basic Task"
+3. Nume: "AFDJ Daily"
+4. Trigger: Daily at 09:30
+5. Action: `python C:\path\to\afdj_pdf_scraper.py`
+
+### Linux/Mac (Cron):
+
+```bash
+crontab -e
+
+# Adaugă (rulează zilnic la 09:30):
+30 9 * * * cd /path/to/afdj-scraper-clean && python afdj_pdf_scraper.py
+```
+
+---
+
+## 📁 Fișiere Esențiale
+
+```
+afdj-scraper-clean/
+├── afdj_pdf_scraper.py          # ⭐ PRINCIPAL - PDF scraper
+├── generate_charts.py           # 📊 Generare grafice
+├── requirements.txt             # Dependințe
+└── README.md                    # Documentație
+```
+
+---
+
+## 💾 Salvare Date pe GitHub (Opțional)
+
+Dacă vrei istoric pe GitHub:
+
+```bash
+# După scraping local:
+python afdj_pdf_scraper.py
+
+# Push manual pe GitHub:
+git add cote_pdf.json
+git commit -m "Update $(date +%Y-%m-%d)"
+git push
+```
+
+**GitHub Actions** poate apoi să **proceseze** datele (grafice, analiză), dar **NU** să le scraping!
+
+---
+
+## 🎯 Workflow Recomandat
+
+```
+┌─────────────────────────────────────┐
+│ 1. COMPUTERUL TĂU (09:30 zilnic)   │
+│    python afdj_pdf_scraper.py       │
+│    → cote_pdf.json                  │
+└─────────────────────────────────────┘
+          ↓ (manual sau script)
+┌─────────────────────────────────────┐
+│ 2. GITHUB (opțional)                │
+│    git push                          │
+└─────────────────────────────────────┘
+          ↓ (automat)
+┌─────────────────────────────────────┐
+│ 3. GITHUB ACTIONS                   │
+│    Procesează JSON → Grafice        │
+└─────────────────────────────────────┘
+```
+
+---
+
+## ✅ Avantaje Soluție Simplă
+
+- ✅ **Funcționează 100%** (fără blocking)
+- ✅ **Simplu** - un singur script
+- ✅ **Rapid** - ~3 secunde
+- ✅ **Sigur** - date locale
+- ✅ **Fără configurare cloud**
+
+---
+
+## 📞 Întrebări Frecvente
+
+**Q: De ce nu merge pe GitHub Actions?**  
+A: AFDJ blochează toate IP-urile de servere publice. E politica lor de protecție.
+
+**Q: Pot automatiza local?**  
+A: DA! Folosește Cron (Linux/Mac) sau Task Scheduler (Windows).
+
+**Q: Pot pune rezultatele pe GitHub?**  
+A: DA! Scraping LOCAL → Push manual → GitHub Actions procesează.
+
+---
+
+**🌊 Keep it simple! 📊**
