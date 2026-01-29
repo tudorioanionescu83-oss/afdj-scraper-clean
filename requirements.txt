@@ -1,0 +1,18 @@
+# Core dependencies - PDF Scraping
+pdfplumber>=0.10.0
+requests>=2.31.0
+pandas>=2.0.0
+openpyxl>=3.1.0
+
+# Data visualization
+matplotlib>=3.7.0
+seaborn>=0.12.0
+
+# Optional: HTML scraping backup (if needed)
+beautifulsoup4>=4.12.0
+lxml>=4.9.0
+
+# Optional: Selenium scraping backup (if needed)
+# Uncomment if you want to use Selenium as fallback
+# selenium>=4.15.0
+# undetected-chromedriver>=3.5.0
